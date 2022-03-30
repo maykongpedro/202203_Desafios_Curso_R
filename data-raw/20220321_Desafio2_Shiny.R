@@ -1,18 +1,13 @@
 
 library(shiny)
 
-# Rascunho ----------------------------------------------------------------
-start <- Sys.time()
-end <- Sys.time()
-time <- end - start
-as.numeric(time)
-
 # Ui ----------------------------------------------------------------------
   
 ui <- fluidPage(
     
     
     h2("Curso R - Desafio 2: Botão de contagem em Shiny"),
+    h3("Autor: Maykon G. Pedro"),
     sidebarLayout(
         
         sidebarPanel = sidebarPanel(
@@ -28,7 +23,7 @@ ui <- fluidPage(
         
         mainPanel = mainPanel(
             # output de texto
-            textOutput(outputId = "numero")
+            htmlOutput(outputId = "texto")
         )
     )
   
@@ -39,7 +34,7 @@ ui <- fluidPage(
 server <- function(input, output, session) {
 
   # contador para cada vez que o botão é clicado
-  contador <- reactiveVal(value = 0)
+  contador <- reactiveVal(0)
   
   # tempo entre as contagens
   time <- reactiveVal()
@@ -55,43 +50,31 @@ server <- function(input, output, session) {
       time(capture.output(tictoc::toc()))
       tictoc::tic()
       
-      # # condição
-      # if (time() < 2) {
-      #   # contador
-      #   cont <- contador() # recebe o valor reativo
-      #   contador(cont + 1) # atualiza pra cada vez que o botão é clicado
-      #   
-      # } else {
-      #     contador(NULL)
-      #     print("passei por aqui")
-      # }      
+      # condição
+      # necessário usar o shiny::req para não estourar erro na primeira rodada
+      if (req(time()) > 2) { 
       
-      # # condição
-      # if (time() > 2) {
-      #   contador(NULL)
-      #   print("passei por aqui")
-      # } else {
-      #   
-      #   # contador
-      #   cont <- contador() # recebe o valor reativo
-      #   contador(cont + 1) # atualiza pra cada vez que o botão é clicado
-      #   
-      # }
-    }
+        contador(0)
+        # print("passei por aqui")
+      }
+      
+      }
   )
   
   # output -> contador que imprime os cliques
-  output$numero <- renderText({
+  output$texto <- renderUI({
 
-    paste0(
+    shiny::HTML(
       
-      "Quantidade de vezes que você clicou no botão:",
-      contador(),
-      
-      "Tempo entre cliques:",
-      time()
-      
+      paste0(
+        "Quantidade de vezes que você clicou no botão: ",
+        "<b>", contador(), "</b>",
+        "<br/>",
+        "Tempo entre cliques: ",
+        "<b>", time(), "</b>"
+      )
     )
+    
   })
   
 }
